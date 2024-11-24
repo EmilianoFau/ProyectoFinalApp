@@ -1,8 +1,20 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const getToken = async () => {
+    try {
+        const token = await AsyncStorage.getItem("token");
+        return token;
+    } catch (error) {
+        console.error("Error retrieving token:", error);
+        return null;
+    }
+};
+
 export const getInfo = async () => {
+    const token = await getToken();
+    console.log(token);
     const URL = "http://localhost:3001/api/posts/feed";
     try {
-        const token = localStorage.getItem("token");
-
         if (!token) {
             console.error("No token found");
             return; 
@@ -25,6 +37,28 @@ export const getInfo = async () => {
     }
 };
 
+export async function postDataApplicationJson(url: string, data: any) {
+    const token = await getToken();
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                "bypass-tunnel-reminder": "true",
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(data),
+        });
+        const result = await response.json();
+        return { response, result };
+    } catch (error) {
+        console.log('Could not add the element: ', error);
+        return { response: undefined, result: undefined };
+    }
+}
+
+/* si */
+/*
 export async function getElement(url, id, token) {
     const elementUrl = `${url}/${id}`;
     try {
@@ -139,20 +173,4 @@ export async function postData(url, data, token) {
         console.log('Could not add the element: ', error);
     }
 }
-
-export async function postDataApplicationJson(url, data, token) {
-    try {
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: data
-        });
-        const result = await response.json();
-        return { response, result };
-    } catch (error) {
-        console.log('Could not add the element: ', error);
-    }
-}
+*/

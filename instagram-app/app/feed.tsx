@@ -6,9 +6,9 @@ import React from "react";
 
 interface Post {
     _id: string;
-    user: string;
+    user: { username: string; profilePicture: string };    
     imageUrl: string;
-    caption: number;
+    caption: string;
     comments: string[];
     likes: string[];
 }
@@ -21,6 +21,7 @@ const Feed = () => {
         const fetchInfo = async () => {
           const response = await getInfo();
           setPosts(response);
+          console.log(response);
           setLoading(false);
         };
     
@@ -57,10 +58,10 @@ const Feed = () => {
             <Link
               href={{
                 pathname: "/profile",
-                params: { username: post.user },
+                params: { username: post.user.username },
               }}
             >
-              <Text style={styles.username}>@{post.user}</Text>
+              <Text style={styles.username}>@{post.user.username}</Text>
             </Link>
 
             <Image source={{ uri: post.imageUrl }} style={styles.postImage} />
@@ -97,10 +98,6 @@ const styles = StyleSheet.create({
       marginBottom: 16,
       padding: 16,
       width: "90%",
-      shadowColor: "#000",
-      shadowOpacity: 0.1,
-      shadowOffset: { width: 0, height: 2 },
-      shadowRadius: 4,
       elevation: 2,
     },
     postImage: {
