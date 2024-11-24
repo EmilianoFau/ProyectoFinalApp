@@ -1,12 +1,29 @@
-export async function getData(url, headers) {
+export const getInfo = async () => {
+    const URL = "http://localhost:3001/api/posts/feed";
     try {
-        const response = await fetch(url, headers);
-        const data = await response.json();
-        return data;
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+            console.error("No token found");
+            return; 
+        }
+        const response = await fetch(URL, {
+            headers: {
+                "bypass-tunnel-reminder": "true",
+                'Authorization': `Bearer ${token}`
+            },
+        });
+        if (response.ok) {
+            const data = await response.json();
+            return data;
+        } else {
+            console.log("Error getting info");
+            return [];
+        }
     } catch (error) {
-        console.error('Error fetching data: ', error);
+        console.error(error);
     }
-}
+};
 
 export async function getElement(url, id, token) {
     const elementUrl = `${url}/${id}`;
