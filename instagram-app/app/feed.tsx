@@ -1,4 +1,4 @@
-import { Text, View, ScrollView, StyleSheet, TouchableOpacity, Platform } from "react-native";
+import { Text, View, ScrollView, StyleSheet, TouchableOpacity, Platform, ActivityIndicator, Image } from "react-native";
 import { useEffect, useState } from "react";
 import { getInfo } from "../app/shared/server";
 import { Stack, Link } from "expo-router";
@@ -13,18 +13,28 @@ interface Post {
     likes: string[];
 }
 
-const Index = () => {
+const Feed = () => {
     const [posts, setPosts] = useState<Post[]>([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchInfo = async () => {
           const response = await getInfo();
           setPosts(response);
+          setLoading(false);
         };
     
         fetchInfo();
     }, []);
 
+    if (loading) {
+        return (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#0000ff" />
+            <Text>Loading posts...</Text>
+          </View>
+        );
+      }
     return (
         <ScrollView
           style={{
@@ -41,112 +51,84 @@ const Index = () => {
             },
         }}
         />
-        <View
-        style={[
-            styles.buttonContainer,
-            Platform.OS === "android"
-            ? styles.buttonContainerAndroid
-            : styles.buttonContainerIOS,
-        ]}
-        >
-        <Link href="/add">
-            <TouchableOpacity
-            style={[
-                styles.addButton,
-                Platform.OS === "android" ? styles.androidButton : styles.iosButton,
-            ]}
+        <View style={styles.container}>
+        {posts.map((post) => (
+          <View key={post._id} style={styles.postContainer}>
+            <Link
+              href={{
+                pathname: "/profile",
+                params: { username: post.user },
+              }}
             >
-            <Text
-                style={
-                Platform.OS === "android"
-                    ? styles.androidButtonText
-                    : styles.iosButtonText
-                }
-            >
-                {Platform.OS === "android" ? "Nuevo Planeta" : "Crear Planeta"}
-            </Text>
-            </TouchableOpacity>
-        </Link>
-        </View>
-        {posts &&
-        posts.map((post) => {
-            return (
-            <View
-                key={post._id}
-                style={{
-                backgroundColor: "white",
-                borderRadius: 10,
-                width: "85%",
-                margin: 16,
-                padding: 16,
-                }}
-            >
-                <Link
-                href={{
-                    pathname: "/details",
-                    params: { id: post.id },
-                }}
-                >
-                <Text style={{ fontWeight: "bold" }}>{post.name}</Text>
-                </Link>
+              <Text style={styles.username}>@{post.user}</Text>
+            </Link>
+
+            <Image source={{ uri: post.imageUrl }} style={styles.postImage} />
+            <Text style={styles.caption}>{post.caption}</Text>
+
+            <View style={styles.actionContainer}>
+              <Text style={styles.actionText}>❤️ {post.likes.length} Likes</Text>
+              <Text style={styles.actionText}>
+                💬 {post.comments.length} Comments
+              </Text>
             </View>
-            );
-        })}
+          </View>
+        ))}
+      </View>
     </ScrollView>
     );
 };
 
-export default Index;
+export default Feed;
 
 const styles = StyleSheet.create({
-    buttonContainer: {
-      marginTop: 16,
+    loadingContainer: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    container: {
+      padding: 10,
+      alignItems: "center",
+    },
+    postContainer: {
+      backgroundColor: "#fff",
+      borderRadius: 8,
       marginBottom: 16,
+      padding: 16,
+      width: "90%",
+      shadowColor: "#000",
+      shadowOpacity: 0.1,
+      shadowOffset: { width: 0, height: 2 },
+      shadowRadius: 4,
+      elevation: 2,
+    },
+    postImage: {
       width: "100%",
-    },
-    buttonContainerAndroid: {
-      alignItems: "flex-start",
-      paddingLeft: 16,
-    },
-    buttonContainerIOS: {
-      alignItems: "flex-end",
-      paddingRight: 16,
-    },
-    addButton: {
-      padding: 12,
+      height: 200,
       borderRadius: 8,
+      marginBottom: 10,
     },
-    androidButton: {
-      backgroundColor: "blue",
-    },
-    iosButton: {
-      backgroundColor: "green",
-    },
-    androidButtonText: {
-      color: "white",
+    username: {
       fontWeight: "bold",
+      fontSize: 16,
+      marginBottom: 10,
+      color: "#007BFF",
+      textDecorationLine: "underline",
+      alignSelf: "flex-start",
     },
-    iosButtonText: {
-      color: "black",
-      fontWeight: "bold",
+    caption: {
+      fontSize: 14,
+      color: "#666",
+      marginBottom: 10,
     },
-    actionButtonsContainer: {
+    actionContainer: {
       flexDirection: "row",
-      justifyContent: "space-around",
-      marginBottom: 16,
+      justifyContent: "space-between",
+      marginBottom: 10,
     },
-    sortButton: {
-      backgroundColor: "#030237",
-      padding: 10,
-      borderRadius: 8,
-    },
-    resetButton: {
-      backgroundColor: "#030237",
-      padding: 10,
-      borderRadius: 8,
-    },
-    buttonText: {
-      color: "white",
-      fontWeight: "bold",
+    actionText: {
+      fontSize: 14,
+      color: "#666",
     },
   });
