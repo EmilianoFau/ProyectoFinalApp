@@ -57,6 +57,25 @@ export async function postDataApplicationJson(url: string, data: any) {
     }
 }
 
+export async function postData(url: string, data: any) {
+    const token = await getToken();
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                "bypass-tunnel-reminder": "true",
+                'Authorization': `Bearer ${token}`
+            },
+            body: data
+        });
+        const result = await response.json();
+        return { response, result };
+    } catch (error) {
+        console.log('Could not add the element: ', error);
+        return { response: undefined, result: undefined };
+    }
+}
+
 /* si */
 /*
 export async function getElement(url, id, token) {

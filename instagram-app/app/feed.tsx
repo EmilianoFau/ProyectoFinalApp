@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { getInfo } from "../app/shared/server";
 import { Stack, Link } from "expo-router";
 import React from "react";
+import TopNav from './components/topNav';  
+import BottomNav from './components/bottomNav';
 
 interface Post {
     _id: string;
@@ -13,7 +15,7 @@ interface Post {
     likes: string[];
 }
 
-const Feed = () => {
+const Feed: React.FC = () => {
     const [posts, setPosts] = useState<Post[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -37,6 +39,8 @@ const Feed = () => {
         );
       }
     return (
+      <View style={styles.feedContainer}>
+        <TopNav />
         <ScrollView
           style={{
             flex: 1,
@@ -77,6 +81,8 @@ const Feed = () => {
         ))}
       </View>
     </ScrollView>
+    <BottomNav />
+    </View>
     );
 };
 
@@ -89,8 +95,12 @@ const styles = StyleSheet.create({
       alignItems: "center",
     },
     container: {
+      flex: 1,
       padding: 10,
       alignItems: "center",
+    },
+    feedContainer: {
+      flex: 1,
     },
     postContainer: {
       backgroundColor: "#fff",

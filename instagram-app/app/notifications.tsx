@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-const Profile = () => {
+const Notifications = () => {
     return (
         <View style={styles.container}>
             <Text>This feature will be available in future updates ;)</Text>
@@ -17,4 +17,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default Profile;
+export default Notifications;
